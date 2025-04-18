@@ -46,17 +46,20 @@ type ProductRow = {
   tags: string;
   price: string;
   available: boolean;
+  body_html: string;
+  image: string;
 };
 
-export default function ProductTable() {
+export default function ProductTable({ onProductSelect }: { onProductSelect: (product: ProductRow) => void }) {
+  const [lastSync, setLastSync] = useState<string | null>(null);
   const [rowData, setRowData] = useState<ProductRow[]>([]);
   const [columnDefs] = useState([
-    { headerName: 'Title', minWidth: 400, field: 'title', sortable: true, filter: true, filterParams: textFilterParams },
-    { headerName: 'Type', minWidth: 75, field: 'product_type', sortable: true, filter: 'agTextColumnFilter', filterParams: textFilterParams },
+    { headerName: 'Title', minWidth: 400, field: 'title' as keyof ProductRow, sortable: true, filter: true, filterParams: textFilterParams },
+    { headerName: 'Type', minWidth: 75, field: 'product_type' as keyof ProductRow, sortable: true, filter: 'agTextColumnFilter', filterParams: textFilterParams },
     {
       headerName: 'Price (£)',
       minWidth: 100,
-      field: 'price',
+      field: 'price' as keyof ProductRow,
       sortable: true,
       filter: 'agNumberColumnFilter',
       filterParams: {
@@ -70,7 +73,7 @@ export default function ProductTable() {
     { 
       headerName: 'Available',
       minWidth: 100,
-      field: 'available',
+      field: 'available' as keyof ProductRow,
       sortable: true,
       filter: true,
       valueGetter: (params: any) => (params.data.available === 1 ? 'Available' : 'Not Available'),
@@ -82,23 +85,44 @@ export default function ProductTable() {
   ]);
 
   useEffect(() => {
+    async function fetchLastSync() {
+      try {
+        const res = await fetch('/api/lastSync');
+        const data = await res.json();
+        setLastSync(data.lastSync);
+      } catch (error) {
+        console.error('Failed to fetch last sync timestamp:', error);
+      }
+    }
+
+    fetchLastSync();
+
     fetch('/api/products')
       .then(res => res.json())
       .then(data => setRowData(data));
   }, []);
 
+  const onRowClicked = (event: any) => {
+    onProductSelect(event.data);
+  };
+
   return (
     <div
       className="ag-theme-quartz-dark"
-      style={{ height: '100%', width: '100%', maxWidth: 1200 }} // Added maxWidth and centering
+      style={{ height: '100%', width: '100%', maxWidth: 1200 }} 
     >
       <AgGridReact
         rowData={rowData}
         columnDefs={columnDefs}
         pagination={true}
         paginationPageSize={10}
-        enableFilter={true}
+        onRowClicked={onRowClicked}
       />
+      {lastSync && (
+      <p style={{ fontSize: 'small', marginTop: '10px' }}>
+        Last synced: {new Date(lastSync).toLocaleString()}
+      </p>
+    )}
     </div>
   );
 }
