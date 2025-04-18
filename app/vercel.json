@@ -2,12 +2,12 @@
     "crons": [
       {
         "path": "/api/sync",
-        "schedule": "*/15 * * * *"
+        "schedule": "0 0 * * *"
       }
     ],
     "functions": {
       "api/*.js": {
-        "maxDuration": 45 
+        "maxDuration": 30 
       }
     }
   }
