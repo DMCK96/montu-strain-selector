@@ -76,7 +76,7 @@ export default function ProductTable({ onProductSelect }: { onProductSelect: (pr
       field: 'available' as keyof ProductRow,
       sortable: true,
       filter: true,
-      valueGetter: (params: any) => (params.data.available === 1 ? 'Available' : 'Not Available'),
+      valueGetter: (params: any) => (params.data.available === true ? 'Available' : 'Not Available'),
       filterParams: {
         filterOptions: ['contains', 'notContains'],
         textFormatter: (value: string | null) => value?.toLowerCase(),
