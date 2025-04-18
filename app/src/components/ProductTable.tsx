@@ -46,9 +46,11 @@ type ProductRow = {
   tags: string;
   price: string;
   available: boolean;
+  body_html: string;
+  image: string;
 };
 
-export default function ProductTable() {
+export default function ProductTable({ onProductSelect }: { onProductSelect: (product: ProductRow) => void }) {
   const [rowData, setRowData] = useState<ProductRow[]>([]);
   const [columnDefs] = useState([
     { headerName: 'Title', minWidth: 400, field: 'title', sortable: true, filter: true, filterParams: textFilterParams },
@@ -87,10 +89,14 @@ export default function ProductTable() {
       .then(data => setRowData(data));
   }, []);
 
+  const onRowClicked = (event: any) => {
+    onProductSelect(event.data);
+  };
+
   return (
     <div
       className="ag-theme-quartz-dark"
-      style={{ height: '100%', width: '100%', maxWidth: 1200 }} // Added maxWidth and centering
+      style={{ height: '100%', width: '100%', maxWidth: 1200 }} 
     >
       <AgGridReact
         rowData={rowData}
@@ -98,6 +104,7 @@ export default function ProductTable() {
         pagination={true}
         paginationPageSize={10}
         enableFilter={true}
+        onRowClicked={onRowClicked}
       />
     </div>
   );
