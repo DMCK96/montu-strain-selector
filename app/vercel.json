@@ -6,7 +6,7 @@
       }
     ],
     "functions": {
-      "api/sync/route.ts": {
+      "api/sync/*.ts": {
         "maxDuration": 30 
       }
     }
