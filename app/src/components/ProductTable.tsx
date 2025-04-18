@@ -51,6 +51,7 @@ type ProductRow = {
 };
 
 export default function ProductTable({ onProductSelect }: { onProductSelect: (product: ProductRow) => void }) {
+  const [lastSync, setLastSync] = useState<string | null>(null);
   const [rowData, setRowData] = useState<ProductRow[]>([]);
   const [columnDefs] = useState([
     { headerName: 'Title', minWidth: 400, field: 'title' as keyof ProductRow, sortable: true, filter: true, filterParams: textFilterParams },
@@ -84,6 +85,18 @@ export default function ProductTable({ onProductSelect }: { onProductSelect: (pr
   ]);
 
   useEffect(() => {
+    async function fetchLastSync() {
+      try {
+        const res = await fetch('/api/lastSync');
+        const data = await res.json();
+        setLastSync(data.lastSync);
+      } catch (error) {
+        console.error('Failed to fetch last sync timestamp:', error);
+      }
+    }
+
+    fetchLastSync();
+
     fetch('/api/products')
       .then(res => res.json())
       .then(data => setRowData(data));
@@ -105,6 +118,11 @@ export default function ProductTable({ onProductSelect }: { onProductSelect: (pr
         paginationPageSize={10}
         onRowClicked={onRowClicked}
       />
+      {lastSync && (
+      <p style={{ fontSize: 'small', marginTop: '10px' }}>
+        Last synced: {new Date(lastSync).toLocaleString()}
+      </p>
+    )}
     </div>
   );
 }

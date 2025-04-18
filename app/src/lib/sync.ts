@@ -6,9 +6,7 @@ import { insertProduct } from './repositories/productRepo';
 import { insertVariant, deleteVariantsForProduct } from './repositories/variantRepo';
 import { insertImage, deleteImagesForProduct } from './repositories/imageRepo';
 
-
 const DATA_URL = process.env.DATA_URL;
-console.log(DATA_URL)
 
 export async function syncData() {
   if (typeof DATA_URL !== 'string' || DATA_URL.trim() === '') {
@@ -35,4 +33,7 @@ export async function syncData() {
   });
 
   tx();
+
+  // Log the last sync timestamp
+  db.prepare('INSERT INTO last_sync (timestamp) VALUES (CURRENT_TIMESTAMP)').run();
 }
