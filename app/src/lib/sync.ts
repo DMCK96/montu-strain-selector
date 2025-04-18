@@ -16,24 +16,28 @@ export async function syncData() {
   const res = await axios.get(DATA_URL);
   const products: Product[] = res.data.products;
 
-  const tx = db.transaction(() => {
+  const client = await db.connect();
+  try {
+    await client.query('BEGIN');
     for (const product of products) {
-      insertProduct(product);
+      await insertProduct(product);
 
-      deleteVariantsForProduct(product.id);
+      await deleteVariantsForProduct(product.id);
       for (const variant of product.variants) {
-        insertVariant(variant);
+        await insertVariant(variant);
       }
 
-      deleteImagesForProduct(product.id);
+      await deleteImagesForProduct(product.id);
       for (const image of product.images) {
-        insertImage(image, product.id);
+        await insertImage(image, product.id);
       }
     }
-  });
-
-  tx();
-
-  // Log the last sync timestamp
-  db.prepare('INSERT INTO last_sync (timestamp) VALUES (CURRENT_TIMESTAMP)').run();
+    await client.query('INSERT INTO last_sync (timestamp) VALUES (CURRENT_TIMESTAMP)');
+    await client.query('COMMIT');
+  } catch (err) {
+    await client.query('ROLLBACK');
+    throw err;
+  } finally {
+    client.release();
+  }
 }

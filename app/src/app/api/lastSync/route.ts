@@ -4,7 +4,8 @@ import db from '@/lib/db';
 
 export async function GET(req: NextRequest) {
   try {
-    const row = db.prepare('SELECT timestamp FROM last_sync ORDER BY id DESC LIMIT 1').get() as { timestamp: string | null };
+    const result = await db.query('SELECT timestamp FROM last_sync ORDER BY id DESC LIMIT 1');
+    const row = result.rows[0];
     return NextResponse.json({ lastSync: row?.timestamp || null });
   } catch (error) {
     console.error('Failed to fetch last sync timestamp:', error);
