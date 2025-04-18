@@ -9,6 +9,7 @@ export async function GET() {
     FROM products p
     LEFT JOIN variants v ON v.product_id = p.id
     LEFT JOIN images i ON i.product_id = p.id
+    WHERE p.product_type != 'Accessory'
     GROUP BY p.id, v.price, v.grams, i.src, v.available, p.body_html
     ORDER BY p.title ASC
   `);
