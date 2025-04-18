@@ -1,22 +1,20 @@
 import axios from 'axios';
 import db from './db';
-import dotenv from 'dotenv';
 
 import { Product } from './models/product';
 import { insertProduct } from './repositories/productRepo';
 import { insertVariant, deleteVariantsForProduct } from './repositories/variantRepo';
 import { insertImage, deleteImagesForProduct } from './repositories/imageRepo';
 
-// Load environment variables from .env.local or .env
-dotenv.config({ path: '.env.local' });
 
 const DATA_URL = process.env.DATA_URL;
+console.log(DATA_URL)
 
 export async function syncData() {
   if (typeof DATA_URL !== 'string' || DATA_URL.trim() === '') {
     throw new Error('DATA_URL is not defined or is invalid. Please check your environment variables.');
   }
-  
+
   const res = await axios.get(DATA_URL);
   const products: Product[] = res.data.products;
 

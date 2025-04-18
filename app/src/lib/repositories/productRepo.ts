@@ -39,10 +39,13 @@ export function getProductsWithStatus(): Product[] {
     FROM products
   `);
 
-  const products = stmt.all();
+  const products: Product[] = stmt.all() as Product[];
+  if (!products) {
+    return [];
+  }
 
   return products.map((product) => {
-    const tags = JSON.parse(product.tags || '[]');
+    const tags = Array.isArray(product.tags) ? product.tags : JSON.parse(product.tags || '[]') as string[];
     const status = determineStatus(tags);
     return { ...product, status };
   });

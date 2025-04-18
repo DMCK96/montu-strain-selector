@@ -53,12 +53,12 @@ type ProductRow = {
 export default function ProductTable({ onProductSelect }: { onProductSelect: (product: ProductRow) => void }) {
   const [rowData, setRowData] = useState<ProductRow[]>([]);
   const [columnDefs] = useState([
-    { headerName: 'Title', minWidth: 400, field: 'title', sortable: true, filter: true, filterParams: textFilterParams },
-    { headerName: 'Type', minWidth: 75, field: 'product_type', sortable: true, filter: 'agTextColumnFilter', filterParams: textFilterParams },
+    { headerName: 'Title', minWidth: 400, field: 'title' as keyof ProductRow, sortable: true, filter: true, filterParams: textFilterParams },
+    { headerName: 'Type', minWidth: 75, field: 'product_type' as keyof ProductRow, sortable: true, filter: 'agTextColumnFilter', filterParams: textFilterParams },
     {
       headerName: 'Price (£)',
       minWidth: 100,
-      field: 'price',
+      field: 'price' as keyof ProductRow,
       sortable: true,
       filter: 'agNumberColumnFilter',
       filterParams: {
@@ -72,7 +72,7 @@ export default function ProductTable({ onProductSelect }: { onProductSelect: (pr
     { 
       headerName: 'Available',
       minWidth: 100,
-      field: 'available',
+      field: 'available' as keyof ProductRow,
       sortable: true,
       filter: true,
       valueGetter: (params: any) => (params.data.available === 1 ? 'Available' : 'Not Available'),
@@ -103,7 +103,6 @@ export default function ProductTable({ onProductSelect }: { onProductSelect: (pr
         columnDefs={columnDefs}
         pagination={true}
         paginationPageSize={10}
-        enableFilter={true}
         onRowClicked={onRowClicked}
       />
     </div>
